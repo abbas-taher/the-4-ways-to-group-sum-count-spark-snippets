@@ -17,7 +17,7 @@ For illustration purposes, I am using 6 data pairs that represent sales records 
             (idB,(3,18))
             (idC,(1,7))
 
-In this example the sale values are grouped by the key then each set of values belonging to the same key are counted and totaled to generate the result tuples. For example there are two sales records with a total value of 6 for idA.
+In this example the sale values are grouped by the key then each set of values belonging to the same key are counted and totaled to generate the result tuples. For example there are 2 sales records with a total value of 6 for idA.
 
 ## Example 2: Using RDD with reduceByKey
      val sales = sc.parallelize( Seq( ("idA", 2), ("idA", 4), ("idB", 3), ("idB",5),("idB",10),("idC",7) ) )
@@ -29,7 +29,7 @@ In this example the sale values are grouped by the key then each set of values b
             (idB,(3,18))
             (idC,(1,7))
 
-In this example the sale values are mapped and counted (similar to word count) then both the values and the count are totaled separately.
+In this example the sale values are mapped to a tuple for counting purposes (similar to word count) then both the values and the counts are totaled separately with a reduceByKey operation.
 
 ## Example 3: Using DataFrames with groupBy and agg operations 
 
@@ -37,15 +37,16 @@ In this example the sale values are mapped and counted (similar to word count) t
      val counts = sales.groupBy($"id")
                        .agg( count($"id"),sum($"vl") )
 
-scala> counts.show
-+---+---------+--------+
-| id|count(id)|sum(vl)|
-+---+---------+--------+
-|idA|        2|       6|
-|idB|        3|      18|
-|idC|        1|       7|
-+---+---------+--------+
+     scala> counts.show
+            +---+---------+--------+
+            | id|count(id)|sum(vl)|
+            +---+---------+--------+
+            |idA|        2|       6|
+            |idB|        3|      18|
+            |idC|        1|       7|
+            +---+---------+--------+
 
+In this example the sale records are first converted to a DataFrame using .toDF method. Following the values are grouped and then counted and summed via DataFrames agg operations.
 
 ## Example 4: Using Datasets with SQL select Statement on TempView
 
@@ -54,11 +55,13 @@ scala> counts.show
      val countsTB = sales.createOrReplaceTempView("Sales")
      val counts = spark.sql("SELECT id, count(vl), sum(vl) from Sales GROUP BY id")
 
-scala> counts.show
-+---+---------+-------+
-| id|count(vl)|sum(vl)|
-+---+---------+-------+
-|idA|        2|      6|
-|idB|        3|     18|
-|idC|        1|      7|
-+---+---------+-------+
+     scala> counts.show
+            +---+---------+-------+
+            | id|count(vl)|sum(vl)|
+            +---+---------+-------+
+            |idA|        2|      6|
+            |idB|        3|     18|
+            |idC|        1|      7|
+            +---+---------+-------+
+
+In this example the sale records are first converted to a DataFrame using .toDF method. Following the values are grouped and then counted and summed via DataFrames agg operations.
