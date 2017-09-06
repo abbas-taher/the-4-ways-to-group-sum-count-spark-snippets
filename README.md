@@ -48,7 +48,7 @@ In this example, the sale values are mapped to a tuple for counting purposes (si
 
 In this example, the sale records are first converted to a DataFrame using .toDF method. Following the values are grouped and then counted and summed via DataFrames agg operations.
 
-## Example 4: Using Datasets with SQL select Statement on TempView
+## Example 4: Using Datasets with SQL SELECT query on TempView
 
      case class Sales(id: String, vl: Int)
      
@@ -65,4 +65,4 @@ In this example, the sale records are first converted to a DataFrame using .toDF
             |idC|        1|      7|
             +---+---------+-------+
 
-In this example, a case class Sales is first defined. Then the  sale records are converted to a DataFrame using .toDF method and the defined case class. Following a temporary view is created with a name Sales. Then a standard Spark SQL Select statment is executed to query the Sales View.
+In this example, a case class Sales is first defined. Then the  sale records are converted to a DataFrame using .toDF method and the defined case class. Following a temporary view is created with a name Sales. Then a standard Spark SQL SELECT statment is executed to query the Sales View.
