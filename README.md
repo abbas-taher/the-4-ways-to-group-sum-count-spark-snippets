@@ -7,4 +7,54 @@ For illustration purposes, I am using 6 data pairs that represent sales data eac
 
      Seq( ("idA", 2), ("idA", 4), ("idB", 3), ("idB",5),("idB",10),("idC",7) )
      
- 
+## Example 1: Using RDDs with groupByKey
+     val sales = sc.parallelize( Seq( ("idA", 2), ("idA", 4), ("idB", 3), ("idB",5),("idB",10),("idC",7) ) )
+     val counts = sales.groupByKey()
+                       .mapValues(sq => (sq.size,sq.sum)) 
+
+scala> counts.collect.foreach(println)
+(idA,(2,6))
+(idB,(3,18))
+(idC,(1,7))
+
+## Example 2: Using RDD with reduceByKey
+     val sales = sc.parallelize( Seq( ("idA", 2), ("idA", 4), ("idB", 3), ("idB",5),("idB",10),("idC",7) ) )
+     val counts = sales.mapValues((1,_))
+                       .reduceByKey {case (a,b) => ((a._1+b._1),(a._2+b._2))}
+
+counts.collect.foreach(println)
+(idA,(2,6))
+(idB,(3,18))
+(idC,(1,7))
+
+## Example 3: Using DataFrames with groupBy and agg operations 
+
+     val sales = Seq(("idA", 2), ("idA", 4), ("idB", 3), ("idB",5),("idB",10),("idC",7)).toDF("id", "vl")
+     val counts = sales.groupBy($"id")
+                       .agg( count($"id"),sum($"vl") )
+
+scala> counts.show
++---+---------+--------+
+| id|count(id)|sum(vl)|
++---+---------+--------+
+|idA|        2|       6|
+|idB|        3|      18|
+|idC|        1|       7|
++---+---------+--------+
+
+
+## Example 4: Using Datasets with SQL select Statement on TempView
+
+     case class Sales(id: String, vl: Int)
+     val sales = Seq(("idA", 2), ("idA", 4), ("idB", 3), ("idB",5),("idB",10),("idC",7)).toDF("id", "vl")
+     val countsTB = sales.createOrReplaceTempView("Sales")
+     val counts = spark.sql("SELECT id, count(vl), sum(vl) from Sales GROUP BY id")
+
+scala> counts.show
++---+---------+-------+
+| id|count(vl)|sum(vl)|
++---+---------+-------+
+|idA|        2|      6|
+|idB|        3|     18|
+|idC|        1|      7|
++---+---------+-------+
